@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧘 呼吸放鬆引導</title>
+    <style>
+        :root {
+            --bg-inhale: #1a2a3a;
+            --bg-hold: #2a3a4a;
+            --bg-exhale: #1a2a3a;
+            --circle-inhale: #4ecca3;
+            --circle-hold: #ffd700;
+            --circle-exhale: #e74c3c;
+            --text-color: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: var(--bg-inhale);
+            color: var(--text-color);
+            transition: background 4s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 背景漸層動畫 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(78, 204, 163, 0.1) 0%, transparent 70%);
+            opacity: 0.5;
+            transition: opacity 4s ease;
+            z-index: -1;
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .instruction {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            min-height: 2rem;
+            opacity: 0.9;
+            transition: opacity 0.5s;
+        }
+
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin: 0 auto 40px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(78, 204, 163, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        .inner-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--circle-inhale);
+            transform: scale(0.6);
+            transition: transform 4s ease-in-out, background 4s ease;
+            opacity: 0.8;
+            box-shadow: 0 0 20px rgba(78, 204, 163, 0.5);
+        }
+
+        /* 動畫狀態類 */
+        .inhale .inner-circle {
+            transform: scale(1.2);
+            background: var(--circle-inhale);
+            box-shadow: 0 0 40px rgba(78, 204, 163, 0.8);
+        }
+
+        .hold .inner-circle {
+            transform: scale(1.2);
+            background: var(--circle-hold);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+        }
+
+        .exhale .inner-circle {
+            transform: scale(0.6);
+            background: var(--circle-exhale);
+            box-shadow: 0 0 40px rgba(231, 76, 60, 0.6);
+        }
+
+        /* 背景顏色變化 */
+        .inhale-body {
+            background: linear-gradient(to bottom, #1a2a3a, #2a4a5a);
+        }
+        
+        .hold-body {
+            background: linear-gradient(to bottom, #2a3a4a, #3a5a6a);
+        }
+        
+        .exhale-body {
+            background: linear-gradient(to bottom, #1a2a3a, #2a3a4a);
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .btn-start {
+            background: var(--circle-inhale);
+            color: #1a2a3a;
+        }
+
+        .btn-stop {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            display: none;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 204, 163, 0.4);
+        }
+
+        .btn-stop:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .info-text {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+            line-height: 1.6;
+        }
+
+        .cycle-counter {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: var(--circle-inhale);
+            min-height: 1.5rem;
+        }
+
+        /* 手機適配 */
+        @media (max-width: 480px) {
+            .breathing-circle {
+                width: 150px;
+                height: 150px;
+            }
+            h1 { font-size: 1.5rem; }
+            .instruction { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🧘 呼吸放鬆</h1>
+    <div class="instruction" id="instruction">準備開始...</div>
+    
+    <div class="breathing-circle" id="circle">
+        <div class="inner-circle"></div>
+    </div>
+
+    <div class="cycle-counter" id="cycleCounter"></div>
+
+    <div class="controls">
+        <button class="btn-start" id="startBtn">開始練習</button>
+        <button class="btn-stop" id="stopBtn">停止</button>
+    </div>
+
+    <div class="info-text">
+        <p>採用 <strong>4-7-8 呼吸法</strong>：</p>
+        <p>吸氣 4 秒 → 憋氣 7 秒 → 呼氣 8 秒</p>
+        <p>重複 4 次循環，感受身體逐漸放鬆。</p>
+    </div>
+</div>
+
+<script>
+    const circle = document.getElementById('circle');
+    const instruction = document.getElementById('instruction');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const cycleCounter = document.getElementById('cycleCounter');
+    const body = document.body;
+
+    let isRunning = false;
+    let cycleCount = 0;
+    let timeoutIds = [];
+
+    // 4-7-8 呼吸法時間設定 (毫秒)
+    const INHALE_TIME = 4000;
+    const HOLD_TIME = 7000;
+    const EXHALE_TIME = 8000;
+    const TOTAL_CYCLE = INHALE_TIME + HOLD_TIME + EXHALE_TIME;
+
+    function resetStyles() {
+        circle.className = 'breathing-circle';
+        body.className = '';
+        instruction.style.opacity = '0';
+    }
+
+    function runBreathingCycle() {
+        if (!isRunning) return;
+
+        cycleCount++;
+        cycleCounter.textContent = `第 ${cycleCount} 次循環`;
+
+        // 1. 吸氣 (4秒)
+        instruction.textContent = "慢慢吸氣...";
+        instruction.style.opacity = '1';
+        circle.classList.add('inhale');
+        body.classList.add('inhale-body');
+
+        setTimeout(() => {
+            if (!isRunning) return;
+
+            // 2. 憋氣 (7秒)
+            instruction.textContent = "保持氣息...";
+            circle.classList.remove('inhale');
+            circle.classList.add('hold');
+            body.classList.remove('inhale-body');
+            body.classList.add('hold-body');
+
+            setTimeout(() => {
+                if (!isRunning) return;
+
+                // 3. 呼氣 (8秒)
+                instruction.textContent = "緩緩呼氣...";
+                circle.classList.remove('hold');
+                circle.classList.add('exhale');
+                body.classList.remove('hold-body');
+                body.classList.add('exhale-body');
+
+                setTimeout(() => {
+                    if (!isRunning) return;
+                    
+                    // 循環結束，準備下一次
+                    runBreathingCycle();
+                }, EXHALE_TIME);
+
+            }, HOLD_TIME);
+
+        }, INHALE_TIME);
+    }
+
+    function startBreathing() {
+        if (isRunning) return;
+        
+        isRunning = true;
+        cycleCount = 0;
+        cycleCounter.textContent = "";
+        
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-block';
+        
+        // 初始狀態
+        resetStyles();
+        instruction.textContent = "準備開始...";
+        instruction.style.opacity = '1';
+        
+        setTimeout(() => {
+            runBreathingCycle();
+        }, 1000);
+    }
+
+    function stopBreathing() {
+        isRunning = false;
+        
+        // 清除所有定時器
+        timeoutIds.forEach(id => clearTimeout(id));
+        
+        resetStyles();
+        instruction.textContent = "練習結束";
+        instruction.style.opacity = '1';
+        
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+        cycleCounter.textContent = "";
+    }
+
+    startBtn.addEventListener('click', startBreathing);
+    stopBtn.addEventListener('click', stopBreathing);
+
+    // 防止意外關閉頁面時未停止
+    window.addEventListener('beforeunload', () => {
+        if (isRunning) {
+            stopBreathing();
+        }
+    });
+</script>
+
+</body>
+</html>
